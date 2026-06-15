@@ -1,0 +1,23 @@
+plan/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Locally-scaffolded Medusa dev store (regenerate via create-medusa-app; see
+# SETUP_GUIDE.md). Huge + generated — never commit it.
+medusa-store/
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log

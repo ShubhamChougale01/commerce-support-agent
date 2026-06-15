@@ -1,0 +1,43 @@
+# Local backing services for a Medusa v2 dev instance.
+#
+# Medusa v2 has no official all-in-one image — the app itself is scaffolded
+# once with create-medusa-app and then runs against these services:
+#
+#   1. docker compose -f docker-compose.medusa.yml up -d
+#   2. npx create-medusa-app@latest medusa-store \
+#        --db-url postgres://medusa:medusa@localhost:5433/medusa
+#      (skip the storefront when prompted; admin UI = yes)
+#   3. cd medusa-store && npm run dev        # admin at http://localhost:9000/app
+#   4. In the admin UI: Settings -> API Key Management -> create a SECRET key
+#      -> put it in .env as MEDUSA_API_KEY (MEDUSA_URL=http://localhost:9000)
+#   5. Seed test data: create 3 products (~Rs500/Rs800/Rs3500) and 2 orders
+#      (one email matching your test customer, one mismatched) via the admin.
+#
+# Port 5433 is used to avoid clashing with any local Postgres on 5432.
+
+services:
+  medusa-postgres:
+    image: postgres:16-alpine
+    container_name: medusa-postgres
+    environment:
+      POSTGRES_USER: medusa
+      POSTGRES_PASSWORD: medusa
+      POSTGRES_DB: medusa
+    ports:
+      - "5433:5432"
+    volumes:
+      - medusa_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medusa"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  medusa-redis:
+    image: redis:7-alpine
+    container_name: medusa-redis
+    ports:
+      - "6380:6379"
+
+volumes:
+  medusa_pgdata:

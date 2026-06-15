@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+httpx
+anthropic
+# Optional Claude backend: used by prompts/_llm_client.py when ANTHROPIC_API_KEY
+# is unset (routes calls through the Claude Code subscription). See README.
+claude-agent-sdk
+python-dotenv
+supabase
+tenacity
+apscheduler
+pytest
+pytest-asyncio
