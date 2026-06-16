@@ -127,12 +127,14 @@ def build_note_html(
     return "\n".join(parts)
 
 
-async def log_escalation(data: dict) -> None:
-    """Insert an audit row into the Supabase `escalations` table."""
+async def log_escalation(data: dict) -> str | None:
+    """Insert an audit row into the Supabase `escalations` table. Returns the row id."""
     try:
-        _get_supabase().table("escalations").insert(data).execute()
+        result = _get_supabase().table("escalations").insert(data).execute()
+        return result.data[0]["id"] if result.data else None
     except Exception as exc:
         print(f"[escalation] supabase log failed: {exc}", file=sys.stderr)
+        return None
 
 
 async def send_slack_alert(
@@ -151,7 +153,7 @@ async def send_slack_alert(
         f"*Reason:* `{reason}`\n"
         f"*Window:* {sla_hrs} hr SLA"
     )
-    payload = {"channel": channel, "text": text}
+    payload = {"text": text}
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             await client.post(SLACK_WEBHOOK_URL, json=payload)
@@ -220,7 +222,7 @@ async def escalate_to_human(
 
     ack_sent_at = _utcnow_iso()
     fraud_flags = classification.get("fraud_flags", {})
-    await log_escalation(
+    row_id = await log_escalation(
         {
             "ticket_id": str(ticket_id),
             "client_id": brand_config.client_id,
@@ -243,3 +245,8 @@ async def escalate_to_human(
 
     if priority == 1:
         await send_slack_alert(slack_channel, ticket_id, reason or "unknown", sla_hrs, customer_name)
+        if row_id:
+            try:
+                _get_supabase().table("escalations").update({"slack_warned": True}).eq("id", row_id).execute()
+            except Exception as exc:
+                print(f"[escalation] slack_warned update failed: {exc}", file=sys.stderr)
