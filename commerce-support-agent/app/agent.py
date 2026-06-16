@@ -91,9 +91,9 @@ async def run_agent(ticket_id: int, client_id: str = "default") -> None:
 
         # --- Step 6: commerce action (key names kept per D3) ---------------- #
         action_taken: str | None = None
-        shopify_action = classification.get("shopify_action")
+        commerce_action = classification.get("commerce_action")
 
-        if shopify_action == "issue_refund":
+        if commerce_action == "issue_refund":
             amount = classification.get("refund_amount_inr") or 0
             if amount <= brand_config.auto_refund_limit:
                 await issue_refund(
@@ -109,7 +109,7 @@ async def run_agent(ticket_id: int, client_id: str = "default") -> None:
                     reason="refund_above_threshold",
                 )
                 return
-        elif shopify_action == "cancel_order":
+        elif commerce_action == "cancel_order":
             # Never auto-cancel.
             await escalate_to_human(
                 ticket,

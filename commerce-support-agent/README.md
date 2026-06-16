@@ -7,8 +7,8 @@ customer reply. Every auto-reply runs through a quality gate, and anything
 risky (fraud, legal threats, large refunds, low confidence, PII leaks) is
 routed to a human with a full handoff brief.
 
-> Historical note: the project folder is named `shopify-support-agent` because
-> v1 targeted Shopify + Freshdesk. The clients were swapped for Medusa.js and
+> Historical note: the project folder is named `commerce-support-agent` because
+> v1 targeted commerce + Freshdesk. The clients were swapped for Medusa.js and
 > Zoho Desk behind the same internal interfaces (see `plan/MIGRATION_PLAN.md`).
 
 **Status (2026-06-14):** code complete; CI green (9/9); all 5 flows verified

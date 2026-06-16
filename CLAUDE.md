@@ -6,8 +6,8 @@ Production-ready AI customer-support agent: **Zoho Desk** tickets for a
 (Pass 1: classify → JSON; Pass 2: brand-voiced reply), with a quality gate,
 human escalation routing, Supabase audit log, and an SLA watchdog.
 
-> Folder is named `shopify-support-agent/` for historical reasons — v1
-> targeted Shopify + Freshdesk; both were swapped out behind unchanged
+> Folder is named `commerce-support-agent/` for historical reasons — v1
+> targeted commerce + Freshdesk; both were swapped out behind unchanged
 > internal interfaces (adapter pattern). Don't rename without asking.
 
 ## Repo layout
@@ -20,8 +20,8 @@ proj/
 ├── plan/                      ← gitignored working docs
 │   ├── PLAN.md                original 11-phase build plan (all done)
 │   ├── PROGRESS.md            phase-by-phase checklist w/ verification notes
-│   └── MIGRATION_PLAN.md      Freshdesk→Zoho / Shopify→Medusa (M1-M7, done)
-└── shopify-support-agent/     ← the application
+│   └── MIGRATION_PLAN.md      Freshdesk→Zoho / commerce→Medusa (M1-M7, done)
+└── commerce-support-agent/     ← the application
     ├── app/
     │   ├── main.py            FastAPI; POST /webhook/desk (X-Webhook-Secret,
     │   │                      constant-time), idempotency, lifespan watchdog
@@ -61,12 +61,12 @@ Clients normalize INTO these; business logic never sees raw API responses:
 - Order: `{order_number, name, email, total_price, fulfillment_status,
   fulfillments:[{shipment_status, tracking_numbers, tracking_urls,
   estimated_delivery_at}]}`
-- Classifier keys `shopify_action` / `requires_shopify_action` are KEPT as
+- Classifier keys `commerce_action` / `requires_commerce_action` are KEPT as
   internal vocabulary post-migration (decision D3) — don't rename casually.
 
 ## Commands
 ```bash
-cd shopify-support-agent
+cd commerce-support-agent
 pytest -m "not integration"      # CI suite — 9 tests, must stay green
 pytest -m integration            # live APIs; needs full .env
 uvicorn app.main:app --reload    # local run; GET /health

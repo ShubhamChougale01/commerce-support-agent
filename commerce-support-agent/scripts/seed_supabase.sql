@@ -1,4 +1,4 @@
--- Schema for the Shopify Customer Support AI Agent.
+-- Schema for the commerce Customer Support AI Agent.
 -- Run against your Supabase Postgres instance (SQL editor or psql).
 
 -- --------------------------------------------------------------------------

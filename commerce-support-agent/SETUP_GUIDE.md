@@ -62,7 +62,7 @@ Prereqs: Docker Desktop + Node 20+.
 
 1. Start the backing services:
    ```bash
-   cd shopify-support-agent
+   cd commerce-support-agent
    docker compose -f docker-compose.medusa.yml up -d
    ```
 2. Scaffold the store (one-time):

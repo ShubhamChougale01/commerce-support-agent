@@ -40,8 +40,8 @@ Return EXACTLY this JSON schema (and nothing else):
     "reasons": []
   },
   "refund_amount_inr": null,
-  "requires_shopify_action": false,
-  "shopify_action": "issue_refund | cancel_order | null",
+  "requires_commerce_action": false,
+  "commerce_action": "issue_refund | cancel_order | null",
   "escalate": false,
   "escalation_reason": null,
   "resolution_possible": true
@@ -52,9 +52,9 @@ FIELD GUIDANCE:
 - refund_amount_inr: the rupee amount the customer is asking to be refunded, or null
   if no specific refund is requested. Infer from ORDER total when the customer asks
   for a full refund and an amount is available.
-- requires_shopify_action / shopify_action: set when the resolution needs an
+- requires_commerce_action / commerce_action: set when the resolution needs an
   order-system mutation. Use "issue_refund" for refunds and "cancel_order" for
-  cancellations. Otherwise shopify_action must be null.
+  cancellations. Otherwise commerce_action must be null.
 
 FRAUD FLAGS - set fraud_flags.triggered = true and add a short string to
 fraud_flags.reasons for ANY of these:
@@ -93,8 +93,8 @@ def _default_escalation(reason: str = "classifier_error") -> dict:
         "urgency": "medium",
         "fraud_flags": {"triggered": False, "reasons": []},
         "refund_amount_inr": None,
-        "requires_shopify_action": False,
-        "shopify_action": None,
+        "requires_commerce_action": False,
+        "commerce_action": None,
         "escalate": True,
         "escalation_reason": reason,
         "resolution_possible": False,

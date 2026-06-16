@@ -1,6 +1,6 @@
 """Async Medusa.js (v2) Admin API client.
 
-Drop-in replacement for the old Shopify client: exposes the SAME five function
+Drop-in replacement for the old commerce client: exposes the SAME five function
 signatures and normalizes Medusa responses into the order shape the rest of
 the codebase consumes:
 

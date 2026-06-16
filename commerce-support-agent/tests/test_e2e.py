@@ -82,7 +82,7 @@ def _cls(**over):
         "refund_amount_inr": None,
         "escalate": False,
         "escalation_reason": None,
-        "shopify_action": None,
+        "commerce_action": None,
     }
     base.update(over)
     return base
@@ -125,7 +125,7 @@ async def test_fraud_triggers_escalation(harness):
 async def test_refund_under_limit_auto_issues(harness):
     events, set_classification, set_reply = harness
     set_classification(
-        _cls(intent="refund_request", shopify_action="issue_refund", refund_amount_inr=850)
+        _cls(intent="refund_request", commerce_action="issue_refund", refund_amount_inr=850)
     )
     set_reply("Your refund is done. Warm regards, Team")
     await agent.run_agent(4)
@@ -137,7 +137,7 @@ async def test_refund_under_limit_auto_issues(harness):
 async def test_refund_over_limit_escalates(harness):
     events, set_classification, _ = harness
     set_classification(
-        _cls(intent="refund_request", shopify_action="issue_refund", refund_amount_inr=5000)
+        _cls(intent="refund_request", commerce_action="issue_refund", refund_amount_inr=5000)
     )
     await agent.run_agent(5)
     assert events == [("escalate", "refund_above_threshold")]
@@ -146,7 +146,7 @@ async def test_refund_over_limit_escalates(harness):
 @pytest.mark.asyncio
 async def test_cancel_escalates(harness):
     events, set_classification, _ = harness
-    set_classification(_cls(intent="cancellation", shopify_action="cancel_order"))
+    set_classification(_cls(intent="cancellation", commerce_action="cancel_order"))
     await agent.run_agent(6)
     assert events == [("escalate", "human_requested")]
 

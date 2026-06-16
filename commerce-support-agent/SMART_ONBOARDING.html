@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Commerce Support AI Agent — Smart Onboarding</title>
+<style>
+  * { box-sizing: border-box; }
+  body { display: flex; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+  .sidebar { width: 260px; min-height: 100vh; background: linear-gradient(180deg, #4f46e5, #7c3aed); position: fixed; padding: 30px 0; overflow-y: auto; }
+  .sidebar h2 { color: white; font-size: 1rem; padding: 0 20px 15px; border-bottom: 1px solid rgba(255,255,255,0.2); margin: 0 0 10px; }
+  .sidebar .tag { display: inline-block; font-size: 0.7rem; background: rgba(255,255,255,0.18); color: #fff; padding: 2px 8px; border-radius: 12px; margin: 0 20px 16px; letter-spacing: 0.04em; }
+  .sidebar nav a { display: block; color: rgba(255,255,255,0.8); padding: 10px 20px; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; }
+  .sidebar nav a:hover, .sidebar nav a.active { background: rgba(255,255,255,0.15); color: white; padding-left: 28px; }
+  .main { margin-left: 260px; padding: 50px 60px; max-width: 940px; }
+  section { margin-bottom: 70px; scroll-margin-top: 30px; }
+  h2.section-title { font-size: 1.8em; color: #4f46e5; border-bottom: 3px solid #e0e7ff; padding-bottom: 12px; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; }
+  h3 { color: #334155; margin-top: 34px; }
+  h4 { color: #475569; }
+  p { color: #334155; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 20px 0; }
+  .card { background: white; border: 1px solid #e2e8f0; border-left: 4px solid #4f46e5; padding: 18px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  .card h4 { color: #4f46e5; margin: 0 0 8px; font-size: 0.95em; }
+  .card p { margin: 0; font-size: 0.9em; color: #64748b; line-height: 1.6; }
+  .card code { background: #eef2ff; color: #4338ca; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; }
+  .summary { background: #eef2ff; border-left: 4px solid #4f46e5; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0; font-weight: 500; color: #3730a3; }
+  pre { background: #1e1e2e; color: #cdd6f4; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 0.86em; line-height: 1.6; margin: 16px 0; }
+  pre .c { color: #7f849c; }
+  pre .k { color: #f38ba8; }
+  pre .g { color: #a6e3a1; }
+  pre .y { color: #f9e2af; }
+  pre .b { color: #89b4fa; }
+  code.inline { background: #eef2ff; color: #4338ca; padding: 2px 6px; border-radius: 4px; font-size: 0.88em; }
+  .phase { background: white; border: 1px solid #e2e8f0; border-left: 4px solid #7c3aed; padding: 20px 24px; margin: 16px 0; border-radius: 0 8px 8px 0; }
+  .phase strong { color: #7c3aed; display: block; margin-bottom: 12px; font-size: 1em; }
+  .phase ul { margin: 0; padding-left: 20px; }
+  .phase li { margin: 6px 0; color: #475569; }
+  .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 20px 0; }
+  .tech-item { background: white; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px; border-top: 3px solid #4f46e5; }
+  .tech-item strong { display: block; color: #4f46e5; margin-bottom: 4px; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; }
+  .tech-item span { font-size: 0.9em; color: #475569; }
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.9em; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  th { background: #4f46e5; color: white; text-align: left; padding: 10px 14px; font-size: 0.85em; }
+  td { padding: 10px 14px; border-top: 1px solid #e2e8f0; color: #475569; vertical-align: top; }
+  td code, th code { background: rgba(99,102,241,0.12); color: #4338ca; padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .hero { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 50px 60px; margin: -50px -60px 60px; }
+  .hero h1 { font-size: 2.2em; margin: 0 0 10px; }
+  .hero p { margin: 0; opacity: 0.92; font-size: 1.05em; color: #fff; }
+  .hero .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 20px; font-size: 0.85em; margin-top: 14px; margin-right: 8px; }
+  .pill { display: inline-block; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 2px 10px; border-radius: 20px; font-size: 0.78em; font-weight: 600; }
+  .pill.warn { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+  .note { background: #fff7ed; border-left: 4px solid #f97316; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 0.92em; color: #9a3412; }
+  .back-top { position: fixed; bottom: 30px; right: 30px; background: #4f46e5; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.3s; border: none; font-size: 1.2em; box-shadow: 0 4px 12px rgba(79,70,229,0.4); }
+  .back-top.show { opacity: 1; }
+  footer { margin-top: 50px; padding-top: 24px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 0.85em; }
+  @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 30px 20px; } .hero { margin: -30px -20px 40px; padding: 40px 20px; } }
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>Commerce Support AI Agent</h2>
+    <span class="tag">/smart-onboarding</span>
+    <nav>
+      <a href="#what-is">👋 What Is This?</a>
+      <a href="#tech-stack">🏗️ Tech Stack</a>
+      <a href="#organization">🗺️ Code Organization</a>
+      <a href="#flow">🔄 End-to-End Flow</a>
+      <a href="#backend">🖥️ Backend Deep Dive</a>
+      <a href="#ai-orchestration">🤖 AI Orchestration</a>
+      <a href="#safety">🛡️ Safety & Guardrails</a>
+      <a href="#setup">⚙️ Local Setup</a>
+      <a href="#getting-started">🎯 Your Roadmap</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="hero">
+      <h1>Commerce Support AI Agent</h1>
+      <p>An AI customer-support agent that reads Zoho Desk tickets for a Medusa.js store and resolves them with a two-pass Claude pipeline — auto-replying when it's confident, escalating to humans when it's not.</p>
+      <span class="badge">General Overview</span>
+      <span class="badge">Experienced-dev edition</span>
+    </div>
+
+    <!-- ============================================================= -->
+    <section id="what-is">
+      <h2 class="section-title">👋 What Is This Project?</h2>
+      <p>Picture a support inbox for an online store. Customers email things like <em>"where's my order #2?"</em>, <em>"please refund this"</em>, or <em>"I'm calling my lawyer."</em> This service sits behind that inbox and handles each ticket end-to-end: it reads the message, pulls up the customer's real order data, decides what the ticket actually needs, and either writes a warm on-brand reply (and issues the refund) or hands the ticket to the right human team with a full briefing.</p>
+      <p>The whole thing is built around <strong>two separate Claude calls</strong> rather than one mega-prompt. The first call is a cold, JSON-only <strong>classifier</strong> (what is this, how confident am I, is it fraud?). The second is a warm, brand-voiced <strong>reply writer</strong>. Splitting "decide" from "speak" is the core design idea — it keeps the decision auditable and the prose human.</p>
+      <p>It's <strong>multi-tenant by design</strong> (every client gets its own brand voice/policy via <code class="inline">BrandConfig</code>) and <strong>safety-first</strong>: there's a hard cap on auto-refunds, orders are never auto-cancelled, a quality gate scans every outbound reply for leaked PII, and anything uncertain goes to a person.</p>
+      <div class="summary">So basically — tickets come in from Zoho Desk, Claude classifies then replies (or escalates), and a human only sees the cases that genuinely need judgment.</div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="tech-stack">
+      <h2 class="section-title">🏗️ Tech Stack</h2>
+      <p>Pure Python backend, no frontend. Everything talks over HTTP to external SaaS, and each external system is wrapped behind a thin adapter so the business logic never touches a raw API response.</p>
+      <div class="tech-grid">
+        <div class="tech-item"><strong>Web Framework</strong><span>FastAPI + Uvicorn — one webhook endpoint + a health check.</span></div>
+        <div class="tech-item"><strong>AI / LLM</strong><span>Claude (Anthropic). Sonnet 4.6 for classify + reply, Haiku 4.5 for handoff briefs.</span></div>
+        <div class="tech-item"><strong>Helpdesk</strong><span>Zoho Desk — source of tickets, target of replies & escalations (OAuth2).</span></div>
+        <div class="tech-item"><strong>Commerce</strong><span>Medusa.js v2 — orders, fulfillment/tracking, and refunds (Admin API).</span></div>
+        <div class="tech-item"><strong>Database</strong><span>Supabase (Postgres) — idempotency guard + escalation/analytics audit log.</span></div>
+        <div class="tech-item"><strong>Scheduler</strong><span>APScheduler — 15-min SLA watchdog running in the FastAPI lifespan.</span></div>
+        <div class="tech-item"><strong>HTTP / Resilience</strong><span>httpx (async) + tenacity (retry w/ exponential backoff).</span></div>
+        <div class="tech-item"><strong>Alerts</strong><span>Slack incoming webhook — pinged on P1 escalations & SLA warnings.</span></div>
+        <div class="tech-item"><strong>Testing</strong><span>pytest + pytest-asyncio. CI suite mocks all external calls.</span></div>
+        <div class="tech-item"><strong>Packaging</strong><span>Docker (python:3.11-slim). docker-compose for local Medusa.</span></div>
+      </div>
+      <div class="note"><strong>Naming gotcha worth knowing on day one:</strong> the folder is <code>commerce-support-agent/</code> and the classifier keys are <code>commerce_action</code> / <code>requires_commerce_action</code>. That's <em>historical</em> — v1 targeted commerce + Freshdesk. Both were swapped for Medusa + Zoho behind unchanged interfaces (the adapter pattern paying off). Don't rename these without asking — it's a deliberate decision (D3).</div>
+      <div class="summary">So basically — FastAPI glue, Claude for brains, Zoho + Medusa as the two external systems, Supabase for memory/audit, all wrapped in retrying async clients.</div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="organization">
+      <h2 class="section-title">🗺️ Code Organization</h2>
+      <p>Two layers that matter: <code class="inline">app/</code> (the orchestrator + adapters + safety) and <code class="inline">prompts/</code> (the two Claude passes + the LLM client shim). The mental model: <em>app/ decides and acts; prompts/ talk to Claude.</em></p>
+      <pre><span class="c"># the application root: commerce-support-agent/</span>
+app/
+├── main.py          <span class="c">FastAPI app: POST /webhook/desk (secret + idempotency), /health, watchdog lifespan</span>
+├── agent.py         <span class="c">run_agent() — the 9-step orchestrator. THE heart of the system.</span>
+├── zohodesk.py      <span class="c">Zoho Desk client: OAuth token manager, get/patch/reply, normalizes tickets</span>
+├── medusa.py        <span class="c">Medusa v2 client: orders, tracking, 2-step refund, fraud signals</span>
+├── escalation.py    <span class="c">escalate_to_human(): brief + ack + note + reassign + audit + Slack</span>
+├── quality_gate.py  <span class="c">last line of defense: PII regexes, length, overpromise checks</span>
+├── watchdog.py      <span class="c">APScheduler job: warn on Slack at 75% of SLA window</span>
+├── brand_config.py  <span class="c">BrandConfig dataclass (voice, policy, refund limit) — per client</span>
+└── config.py        <span class="c">load_dotenv() lives HERE only; routing table, model ids, limits</span>
+prompts/
+├── classifier.py        <span class="c">Pass 1 — JSON-only, retry-once, safe-escalate fallback</span>
+├── reply_generator.py   <span class="c">Pass 2 — brand-voiced customer reply</span>
+└── _llm_client.py       <span class="c">get_client(): real Anthropic SDK OR Claude subscription shim</span>
+tests/              <span class="c">test_e2e.py (9 mocked CI tests) + live integration smoke tests</span>
+scripts/            <span class="c">seed_supabase.sql — the 3 tables</span>
+Dockerfile, docker-compose.medusa.yml, SETUP_GUIDE.md, BLOCKERS.md</pre>
+      <div class="summary">So basically — read <code>app/agent.py</code> first; everything else is a helper it calls in order.</div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="flow">
+      <h2 class="section-title">🔄 End-to-End Request Flow</h2>
+      <p>One ticket's journey, from Zoho firing a webhook to either an auto-reply or a human handoff. This is <code class="inline">run_agent()</code> in <code class="inline">app/agent.py</code> — nine steps, wrapped in a try/except that turns <em>any</em> failure into a <code class="inline">system_error</code> escalation (a ticket is never silently dropped).</p>
+      <pre>  Zoho Desk workflow  ──POST /webhook/desk──▶  main.py
+   (on Ticket Create)      X-Webhook-Secret        │
+                                                   ├─ verify secret (constant-time)
+                                                   ├─ idempotency check (Supabase)  ──▶ already seen? 200 & stop
+                                                   └─ schedule run_agent() in background, return 200 "accepted"
+
+  run_agent(ticket_id)  ───────────────────────────────────────────────────────────
+   1. get_ticket()           fetch + normalize the Zoho ticket
+   2. enrich w/ Medusa       order by #id from subject/body, else by requester email
+   3. get_ticket_thread()    pull conversation for multi-turn context
+   4. classify_ticket()      ── PASS 1 (Sonnet) ──▶  strict JSON: intent, confidence, fraud, action
+   5. ESCALATION GATE        escalate flag OR fraud? ─▶ escalate_to_human() & STOP
+   6. commerce action        issue_refund (if ≤ ₹2000)  /  cancel_order ─▶ always escalate
+   7. generate_reply()       ── PASS 2 (Sonnet) ──▶  warm, brand-voiced email draft
+   8. quality_gate           PII / length / overpromise?  fail ─▶ escalate_to_human() & STOP
+   9. post_reply() + log     send via Zoho, write analytics row to Supabase
+   ─────────────────────────────────────────────────────────────────────────────────
+   any exception ───────────▶ escalate_to_human("system_error")</pre>
+      <p>Notice the webhook returns <code class="inline">200</code> <em>immediately</em> and does the real work in a FastAPI <code class="inline">BackgroundTask</code>. Zoho gets a fast ack; Claude calls and API round-trips happen off the request path.</p>
+      <div class="summary">So basically — fetch → enrich → classify → (escalate?) → act → reply → gate → send, and the gate at step 5 and step 8 are where humans get pulled in.</div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="backend">
+      <h2 class="section-title">🖥️ Backend Deep Dive</h2>
+
+      <h3>API surface</h3>
+      <div class="card-grid">
+        <div class="card"><h4>POST /webhook/desk</h4><p>The only real entry point. Verifies <code>X-Webhook-Secret</code> (constant-time), de-dupes via Supabase, then dispatches <code>run_agent</code> in the background. Fails <strong>closed</strong> (503) if the idempotency store is down — better a retry than a duplicate refund.</p></div>
+        <div class="card"><h4>GET /health</h4><p>Trivial <code>{"status":"ok"}</code> liveness probe for the platform / load balancer.</p></div>
+      </div>
+
+      <h3>The adapter clients (where raw API → clean shape)</h3>
+      <p>Both clients are <em>drop-in replacements</em> for the old commerce/Freshdesk ones — same function signatures, so the orchestrator never changed when the backends were swapped. They normalize messy vendor JSON into the internal contract everything depends on.</p>
+      <table>
+        <tr><th>Client</th><th>What it does</th><th>Worth knowing</th></tr>
+        <tr><td><code>zohodesk.py</code></td><td>Token manager (cache → refresh → retry-on-401), <code>get_ticket</code>, <code>get_ticket_thread</code>, <code>patch_ticket</code>, <code>post_note</code>, <code>post_reply</code>.</td><td>Strips HTML to text; reply needs explicit from/to so it re-fetches the ticket for the requester email.</td></tr>
+        <tr><td><code>medusa.py</code></td><td>Orders by id/email, fulfillment+tracking, <code>issue_refund</code>, <code>get_customer_order_count</code>.</td><td>Refund is <strong>two-step</strong>: find the captured payment, then POST a refund against it. Display-id lookup pages newest-first &amp; matches client-side (Medusa silently ignores the <code>display_id</code> filter).</td></tr>
+      </table>
+
+      <h3>The internal data contract</h3>
+      <p>This is the glue. Memorize the order shape — it shows up in the classifier prompt, the reply prompt, and the escalation note.</p>
+      <pre><span class="c">// Ticket (from zohodesk.py)</span>
+{ id, subject, requester: { email, name }, description_text }
+
+<span class="c">// Order (from medusa.py)</span>
+{ order_number, name, email, total_price, fulfillment_status,
+  fulfillments: [ { shipment_status, tracking_numbers,
+                    tracking_urls, estimated_delivery_at } ] }</pre>
+
+      <h3>Database (Supabase / Postgres) — 3 tables</h3>
+      <div class="card-grid">
+        <div class="card"><h4>processed_tickets</h4><p>Idempotency guard. The webhook inserts a row <em>before</em> doing work; a repeat delivery short-circuits to 200. Primary key is <code>ticket_id</code>.</p></div>
+        <div class="card"><h4>escalations</h4><p>The audit + SLA-tracking row written every time a ticket goes to a human: reason, confidence, fraud flags, team, priority, SLA hours, the handoff brief, resolution fields. The watchdog reads this.</p></div>
+        <div class="card"><h4>tickets_processed</h4><p>Analytics log written after a reply is auto-sent (intent, confidence, action taken). Note: distinct from <code>processed_tickets</code> despite the near-identical name.</p></div>
+      </div>
+
+      <h3>The SLA watchdog</h3>
+      <p>Started inside the FastAPI <code class="inline">lifespan</code> context, APScheduler runs <code class="inline">sla_watchdog()</code> every 15 minutes. It finds open, un-warned escalations, and once one crosses <strong>75% of its SLA window</strong> it fires a Slack warning and flips <code class="inline">slack_warned</code> so it doesn't nag.</p>
+      <div class="summary">So basically — two thin clients normalize everything into one order/ticket shape, three Supabase tables handle dedupe + audit + analytics, and a background scheduler nudges humans before they breach SLA.</div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="ai-orchestration">
+      <h2 class="section-title">🤖 AI Orchestration Deep Dive</h2>
+      <p>The "agent" here is deliberately <strong>not</strong> a tool-calling loop. It's a fixed, auditable pipeline with two distinct Claude calls plus a small one for handoffs. Each call has one job and a tightly scoped prompt.</p>
+
+      <div class="card-grid">
+        <div class="card"><h4>Pass 1 · Classifier</h4><p><code>prompts/classifier.py</code>, Sonnet 4.6, <code>max_tokens=512</code>. JSON-only system prompt → intent, confidence, sentiment, urgency, fraud_flags, refund amount, action, escalate flag. <strong>Retries once</strong> demanding valid JSON; if still broken, returns a safe escalation dict. It never crashes the pipeline.</p></div>
+        <div class="card"><h4>Pass 2 · Reply Generator</h4><p><code>prompts/reply_generator.py</code>, Sonnet 4.6, <code>max_tokens=800</code>. Builds a brand-aware system prompt from <code>BrandConfig</code> (voice, tone example, refund/exchange policy, sign-off) and writes the customer email. Matches the customer's language; leads with empathy if they're angry.</p></div>
+        <div class="card"><h4>Handoff Brief</h4><p>In <code>escalation.py</code>, Haiku 4.5, <code>max_tokens=150</code>. A terse 3-sentence note for the human taking over — problem, what the AI tried, what to do next. Cheap model, deliberately unemotional. Never blocks an escalation if it fails.</p></div>
+      </div>
+
+      <h3>Why two passes instead of one?</h3>
+      <p>The decision (structured, must be machine-readable and logged) and the voice (free-form, empathetic, on-brand) are different problems. Separating them means you can log exactly <em>why</em> the agent did something, swap the brand voice per client without touching logic, and unit-test classification independently of prose. The fraud rule is a nice example: the classifier is given <code class="inline">CUSTOMER_EMAIL</code> explicitly and only flags a mismatch when it actually has both emails — no guessing.</p>
+
+      <h3>The LLM client switch (important for local dev)</h3>
+      <p><code class="inline">prompts/_llm_client.py::get_client()</code> returns one of two backends with the <em>same</em> <code class="inline">messages.create(...)</code> interface:</p>
+      <table>
+        <tr><th>If…</th><th>You get…</th><th>Use case</th></tr>
+        <tr><td><code>ANTHROPIC_API_KEY</code> is set</td><td>real <code>anthropic.AsyncAnthropic</code></td><td>Production</td></tr>
+        <tr><td>key is blank</td><td><code>AgentSDKAnthropic</code> shim over <code>claude-agent-sdk</code></td><td>Local dev on a logged-in Claude Code subscription (no key)</td></tr>
+      </table>
+      <div class="note"><strong>Heads up:</strong> the repo currently runs with a blank key (subscription auth via the shim). That's fine for dev, but subscription auth for an automated backend isn't an approved Anthropic use case — production must set a real <code>ANTHROPIC_API_KEY</code>.</div>
+      <div class="summary">So basically — a cold JSON classifier decides, a warm brand-voiced writer speaks, a cheap model briefs humans, and one factory function swaps the API key path for the local subscription shim transparently.</div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="safety">
+      <h2 class="section-title">🛡️ Safety &amp; Guardrails</h2>
+      <p>This is the part that makes it production-shaped rather than a demo. The system is built to <em>fail toward a human</em>, never toward a wrong autonomous action.</p>
+      <div class="card-grid">
+        <div class="card"><h4>Hard escalation gate</h4><p>Low confidence (&lt;0.75), any fraud flag, legal threats, abuse, "let me talk to a human", or refunds above threshold → straight to the right team. No reply sent.</p></div>
+        <div class="card"><h4>Refund cap · ₹2000</h4><p><code>AUTO_REFUND_LIMIT_INR</code>. Anything above is escalated to the refunds team, never auto-issued.</p></div>
+        <div class="card"><h4>Never auto-cancel</h4><p>A <code>cancel_order</code> action always routes to a human (decision D-policy). Cancellations are irreversible enough to warrant a person.</p></div>
+        <div class="card"><h4>Quality gate</h4><p><code>quality_gate.py</code> scans every draft for PII (email, Indian phone, Aadhaar, PAN, card last-4, UPI), length &gt;300 words, and overpromises ("I guarantee"). Fail → escalate with the rejected draft attached.</p></div>
+        <div class="card"><h4>Idempotency</h4><p>Webhook de-dupes on <code>ticket_id</code> and fails <em>closed</em> (503) if the store is unreachable — a duplicate refund is worse than a retry.</p></div>
+        <div class="card"><h4>Catch-all escalation</h4><p>Any unhandled exception in <code>run_agent</code> becomes a <code>system_error</code> handoff. Even the escalation failing is logged loudly to stderr.</p></div>
+      </div>
+      <div class="summary">So basically — every risky path (big refund, cancel, uncertainty, leaked PII, a crash) ends with a human holding the ticket, with full context.</div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="setup">
+      <h2 class="section-title">⚙️ Local Setup</h2>
+      <p>You can run the app and the test suite without any live accounts — the CI tests mock every external call. You only need real credentials for the integration tests and an actual end-to-end run.</p>
+      <pre><span class="c"># from the application folder</span>
+<span class="k">cd</span> commerce-support-agent
+
+<span class="c"># install deps (use a venv)</span>
+<span class="b">pip</span> install -r requirements.txt
+
+<span class="c"># for the no-API-key path: log into the Claude CLI once</span>
+<span class="b">claude</span> login
+
+<span class="c"># run the CI suite — 9 tests, fully mocked, must stay green</span>
+<span class="b">pytest</span> -m <span class="g">"not integration"</span>
+
+<span class="c"># run the app locally (then GET http://localhost:8000/health)</span>
+<span class="b">uvicorn</span> app.main:app --reload
+
+<span class="c"># live API smoke tests (needs a full .env)</span>
+<span class="b">pytest</span> -m integration
+
+<span class="c"># build the container (verified working)</span>
+<span class="b">docker</span> build -t support-agent .</pre>
+      <div class="note"><strong>Windows console tip:</strong> prefix Python runs with <code>PYTHONIOENCODING=utf-8</code> when output may contain ₹ — the cp1252 console chokes on it otherwise.</div>
+
+      <h3>Required environment variables</h3>
+      <p>Copy <code class="inline">.env.example</code> → <code class="inline">.env</code> and fill these in. <code class="inline">config.py</code> is the only place <code class="inline">load_dotenv()</code> runs.</p>
+      <table>
+        <tr><th>Variable</th><th>What it's for</th></tr>
+        <tr><td><code>ANTHROPIC_API_KEY</code></td><td>Leave <strong>blank</strong> for the subscription shim; set for production.</td></tr>
+        <tr><td><code>ZOHO_CLIENT_ID / _SECRET / _REFRESH_TOKEN</code></td><td>Zoho Desk OAuth Self-Client credentials.</td></tr>
+        <tr><td><code>ZOHO_ORG_ID</code></td><td>The <em>org</em> id (not the department id — wrong value = 500s).</td></tr>
+        <tr><td><code>ZOHO_DC</code></td><td>Data centre: <code>com</code> / <code>in</code> / <code>eu</code> / <code>com.au</code>.</td></tr>
+        <tr><td><code>ZOHO_FROM_EMAIL</code></td><td>Verified Desk reply mailbox (on .in DC: <code>support@&lt;portal&gt;.zohodesk.in</code>).</td></tr>
+        <tr><td><code>ZOHO_TEAM_FRAUD/LEGAL/REFUNDS/GENERAL</code></td><td>Team IDs for escalation routing.</td></tr>
+        <tr><td><code>MEDUSA_URL / MEDUSA_API_KEY</code></td><td>Medusa Admin API base + secret key.</td></tr>
+        <tr><td><code>SUPABASE_URL / SUPABASE_KEY</code></td><td>Postgres-backed idempotency + audit log.</td></tr>
+        <tr><td><code>SLACK_WEBHOOK_URL</code></td><td>P1 alerts &amp; SLA warnings (optional — escalation works without it).</td></tr>
+        <tr><td><code>DESK_WEBHOOK_SECRET</code></td><td>Shared secret the Zoho workflow sends in <code>X-Webhook-Secret</code>.</td></tr>
+      </table>
+      <div class="note"><strong>Config gotcha:</strong> <code>os.getenv(name, default)</code> returns <code>""</code> for a set-but-empty var. The codebase uses <code>os.getenv(name) or default</code> on the team-id routing for exactly this reason — keep that pattern.</div>
+      <div class="summary">So basically — <code>pip install</code>, <code>claude login</code>, <code>pytest -m "not integration"</code> to confirm green, then fill <code>.env</code> when you need live systems.</div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="getting-started">
+      <h2 class="section-title">🎯 Your Personalized Roadmap</h2>
+      <p>You're experienced across the stack and want the full picture, so this is an orientation path, not a tutorial. The fastest way to <em>own</em> this codebase is to trace one ticket all the way through, then poke at the edges.</p>
+
+      <div class="phase">
+        <strong>Hour 1 — Get it green and read the orchestrator</strong>
+        <ul>
+          <li>Clone, <code>pip install -r requirements.txt</code>, run <code>pytest -m "not integration"</code> — confirm 9 green.</li>
+          <li>Read <code>app/agent.py</code> top to bottom. The 9 numbered steps <em>are</em> the architecture; everything else is a helper.</li>
+          <li>Open <code>tests/test_e2e.py</code> alongside it — the mocks show you exactly what each step expects and returns.</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <strong>Day 1 — Understand the two passes &amp; the contract</strong>
+        <ul>
+          <li>Read both prompts in <code>prompts/</code>. Note the strict JSON schema in the classifier and the brand injection in the reply generator.</li>
+          <li>Memorize the internal Ticket/Order shapes — they're the contract between adapters and logic.</li>
+          <li>Skim <code>_llm_client.py</code> so you understand the API-key vs. subscription-shim switch before you wonder why there's no key.</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <strong>Day 2 — The adapters &amp; the safety net</strong>
+        <ul>
+          <li>Read <code>zohodesk.py</code> (token refresh + normalization) and <code>medusa.py</code> (two-step refund + the display-id paging quirk).</li>
+          <li>Read <code>escalation.py</code> end-to-end — it's the most "wiring-heavy" file and where most real-world bugs will live.</li>
+          <li>Read <code>quality_gate.py</code> and <code>config.py</code>'s <code>ROUTING</code> table — they define what's allowed out the door and where escalations land.</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <strong>Day 3+ — Run it live &amp; find the open threads</strong>
+        <ul>
+          <li>Bring up local Medusa via <code>docker-compose.medusa.yml</code>, point a real <code>.env</code> at it, and run <code>pytest -m integration</code>.</li>
+          <li>Check <code>BLOCKERS.md</code> for the live go-live checklist — that's the current source of truth on what's left.</li>
+          <li>Pick up a known TODO to get your hands dirty: <code>tokens_used</code> is logged as <code>None</code>, the Supabase-backed <code>BrandConfig</code> lookup is stubbed, and <code>COMPETITOR_BRANDS</code> is empty.</li>
+        </ul>
+      </div>
+      <p style="margin-top:24px; font-size:1.05em; color:#4f46e5;"><strong>You've got this.</strong> Trace one ticket through <code class="inline">run_agent</code> and the whole system clicks into place — the rest is just well-named helpers doing exactly what they say. Ping me anytime you want to go deeper on a file. 🚀</p>
+    </section>
+
+    <footer>
+      Generated by /smart-onboarding · 2026-06-16 · Role: General Overview (experienced developer)
+    </footer>
+  </main>
+
+  <button class="back-top" aria-label="Back to top">↑</button>
+
+  <script>
+    document.querySelectorAll('.sidebar nav a').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(link.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+          const active = document.querySelector(`.sidebar nav a[href="#${e.target.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+    const btn = document.querySelector('.back-top');
+    window.addEventListener('scroll', () => btn.classList.toggle('show', window.scrollY > 400));
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  </script>
+</body>
+</html>
