@@ -107,3 +107,9 @@ async def desk_webhook(
 @app.get("/health")
 async def health() -> dict:
     return {"status": "ok"}
+
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8001)), reload=True)

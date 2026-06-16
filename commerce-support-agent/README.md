@@ -128,15 +128,20 @@ cp .env.example .env   # fill in your values
 ### Run
 
 ```bash
-uvicorn app.main:app --reload --port 8000
-curl localhost:8000/health   # → {"status":"ok"}
+uvicorn app.main:app --reload --port 8001
+curl localhost:8001/health   # → {"status":"ok"}
 ```
+
+> **Port note:** the Medusa storefront occupies port 8000. The support agent
+> defaults to **8001**. Set `PORT=8001` in `.env` (already the default in
+> `.env.example`). The full local stack: Medusa backend → 9000, storefront → 8000,
+> support agent → 8001.
 
 ### Run with Docker
 
 ```bash
 docker build -t support-agent .
-docker run --rm -p 8000:8000 --env-file .env support-agent
+docker run --rm -p 8001:8001 --env-file .env support-agent
 ```
 
 The container honours `$PORT`, so it deploys to Railway or Render with no changes.
@@ -164,6 +169,7 @@ The container honours `$PORT`, so it deploys to Railway or Render with no change
 | `SUPABASE_KEY` | Yes | Supabase `service_role` key |
 | `DESK_WEBHOOK_SECRET` | Yes | Shared secret for webhook signature verification |
 | `SLACK_WEBHOOK_URL` | Optional | Incoming webhook URL — enables P1 alerts and SLA warnings |
+| `PORT` | Optional | Port the agent listens on (default `8001`; 8000 is the Medusa storefront) |
 
 See `SETUP_GUIDE.md` for step-by-step account configuration.
 
